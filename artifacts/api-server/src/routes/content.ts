@@ -62,7 +62,15 @@ router.get("/services", async (req, res) => {
 router.get("/projects", async (req, res) => {
   try {
     const data = await db.select().from(projects).orderBy(asc(projects.id));
-    res.json(ListProjectsResponse.parse(data.map((item) => ({ ...item, image: publicUrlForStoredUrl(item.image) }))));
+    res.json(
+      ListProjectsResponse.parse(
+        data.map((item) => ({
+          ...item,
+          image: publicUrlForStoredUrl(item.image),
+          images: item.images.map((image) => publicUrlForStoredUrl(image) ?? image),
+        })),
+      ),
+    );
   } catch (err) {
     req.log.error({ err }, "Failed to load projects");
     res.status(500).json({ error: "Unable to load projects" });

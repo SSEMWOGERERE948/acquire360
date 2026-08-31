@@ -14,7 +14,8 @@ const fields: FieldConfig[] = [
   { name: 'category', label: 'Category', type: 'text', required: true },
   { name: 'description', label: 'Description', type: 'textarea', required: true },
   { name: 'completionDate', label: 'Completion date', type: 'date', required: true },
-  { name: 'image', label: 'Image', type: 'image' },
+  { name: 'image', label: 'Cover image', type: 'image' },
+  { name: 'images', label: 'Project gallery', type: 'images' },
 ];
 
 function toValues(p?: Project): FieldValues {
@@ -25,17 +26,24 @@ function toValues(p?: Project): FieldValues {
     description: p?.description ?? '',
     completionDate: p?.completionDate ?? '',
     image: p?.image ?? '',
+    images: p?.images?.join('\n') ?? '',
   };
 }
 
 function toBody(values: FieldValues) {
+  const images = values.images
+    ? values.images.split('\n').map((url) => url.trim()).filter(Boolean)
+    : [];
+  const image = values.image || images[0] || null;
+
   return {
     title: values.title,
     client: values.client,
     category: values.category,
     description: values.description,
     completionDate: values.completionDate,
-    image: values.image || null,
+    image,
+    images,
   };
 }
 
@@ -55,6 +63,7 @@ export function AdminProjects() {
         { label: 'Title', render: (p) => p.title },
         { label: 'Client', render: (p) => p.client },
         { label: 'Category', render: (p) => p.category },
+        { label: 'Images', render: (p) => p.images?.length ?? 0 },
         { label: 'Completed', render: (p) => p.completionDate },
       ]}
       items={list.data}

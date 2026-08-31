@@ -9,6 +9,8 @@ import { getObjectStream } from "./lib/storage";
 
 const app: Express = express();
 
+app.disable("etag");
+
 app.use(
   pinoHttp({
     logger,
@@ -32,6 +34,10 @@ app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use("/api", (_req, res, next) => {
+  res.setHeader("Cache-Control", "no-store");
+  next();
+});
 app.use("/uploads", express.static(path.resolve(process.cwd(), "public/uploads")));
 app.get(/^\/uploads\/(.+)$/, async (req, res) => {
   const key = req.params[0];

@@ -37,7 +37,7 @@ export type FieldValues = Record<string, string>;
 export interface FieldConfig {
   name: string;
   label: string;
-  type: 'text' | 'textarea' | 'checkbox' | 'date' | 'image' | 'document' | 'select';
+  type: 'text' | 'textarea' | 'checkbox' | 'date' | 'image' | 'images' | 'document' | 'select';
   required?: boolean;
   options?: string[];
   placeholder?: string;
@@ -170,6 +170,98 @@ function UploadField({
   );
 }
 
+function MultiImageField({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (urls: string) => void;
+}) {
+  const media = useListMedia({ query: { queryKey: ['/api/media'] } });
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const urls = value ? value.split('\n').map((url) => url.trim()).filter(Boolean) : [];
+  const images = media.data?.filter((asset) => asset.kind === 'image') ?? [];
+
+  const setUrls = (nextUrls: string[]) => onChange(nextUrls.join('\n'));
+  const toggleUrl = (url: string) => {
+    setUrls(urls.includes(url) ? urls.filter((item) => item !== url) : [...urls, url]);
+  };
+
+  return (
+    <div className="space-y-3">
+      {urls.length > 0 ? (
+        <div className="grid grid-cols-3 gap-2">
+          {urls.map((url) => (
+            <div key={url} className="relative overflow-hidden border border-[hsl(var(--border))] bg-[hsl(var(--muted))]">
+              <img src={url} alt="" className="h-20 w-full object-cover" />
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                onClick={() => setUrls(urls.filter((item) => item !== url))}
+                className="absolute right-1 top-1 h-7 w-7 bg-[hsl(var(--background)/.9)]"
+                aria-label="Remove project image"
+              >
+                <Trash2 size={13} />
+              </Button>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="border border-dashed border-[hsl(var(--border))] p-5 text-center text-xs text-[hsl(var(--muted-foreground))]">
+          No gallery images selected.
+        </div>
+      )}
+      <Button type="button" variant="outline" onClick={() => setPickerOpen(true)} data-testid="button-pick-project-images">
+        <ImageIcon size={16} className="mr-2" />
+        Choose gallery images
+      </Button>
+      <Dialog open={pickerOpen} onOpenChange={setPickerOpen}>
+        <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Choose project images</DialogTitle>
+            <DialogDescription>Select one or more images from the media library.</DialogDescription>
+          </DialogHeader>
+          {media.isLoading ? (
+            <p className="text-sm text-[hsl(var(--muted-foreground))]">Loading media...</p>
+          ) : images.length === 0 ? (
+            <div className="border border-dashed border-[hsl(var(--border))] p-8 text-center text-sm text-[hsl(var(--muted-foreground))]">
+              No images in the media library yet.
+            </div>
+          ) : (
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {images.map((asset) => {
+                const selected = urls.includes(asset.url);
+                return (
+                  <button
+                    key={asset.id}
+                    type="button"
+                    onClick={() => toggleUrl(asset.url)}
+                    className={`border bg-[hsl(var(--card))] p-3 text-left transition-colors ${selected ? 'border-[hsl(var(--secondary))] ring-2 ring-[hsl(var(--secondary)/.25)]' : 'border-[hsl(var(--border))] hover:border-[hsl(var(--secondary))]'}`}
+                    data-testid={`button-pick-project-image-${asset.id}`}
+                  >
+                    <div className="flex h-28 items-center justify-center overflow-hidden bg-[hsl(var(--muted))]">
+                      <img src={asset.url} alt={asset.filename} className="h-full w-full object-cover" />
+                    </div>
+                    <p className="mt-2 truncate text-xs font-semibold text-[hsl(var(--primary))]" title={asset.filename}>
+                      {selected ? 'Selected - ' : ''}{asset.filename}
+                    </p>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+          <DialogFooter>
+            <Button type="button" onClick={() => setPickerOpen(false)}>
+              Done
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
 export function EntityFormFields({
   fields,
   values,
@@ -236,6 +328,12 @@ export function EntityFormFields({
               value={values[field.name] ?? ''}
               onChange={(url) => onChange(field.name, url)}
               kind={field.type}
+            />
+          )}
+          {field.type === 'images' && (
+            <MultiImageField
+              value={values[field.name] ?? ''}
+              onChange={(urls) => onChange(field.name, urls)}
             />
           )}
           {field.type === 'checkbox' && (

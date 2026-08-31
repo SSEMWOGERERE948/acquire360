@@ -53,6 +53,7 @@ export interface Project {
   completionDate: string;
   /** @nullable */
   image?: string | null;
+  images: string[];
 }
 
 export interface ProjectInput {
@@ -67,6 +68,7 @@ export interface ProjectInput {
   completionDate: string;
   /** @nullable */
   image?: string | null;
+  images?: string[];
 }
 
 export interface Product {
@@ -230,4 +232,3 @@ export type UploadRfqAttachmentBody = {
 export type UploadMediaBody = {
   file: Blob;
 };
-

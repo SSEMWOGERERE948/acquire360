@@ -152,14 +152,33 @@ function Home() {
 }
 
 function ServiceCard({ service, index }: { service: Service; index?: number }) {
-  return <article className="group relative min-h-[270px] overflow-hidden border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-7 transition-transform hover:-translate-y-1" data-testid={`card-service-${service.id}`}><div className="absolute right-6 top-6 text-[hsl(var(--secondary))]"><span className="text-[11px] font-bold">0{(index ?? 0) + 1}</span></div><div className="mb-16 flex h-11 w-11 items-center justify-center border border-[hsl(var(--secondary)/.5)] text-[hsl(var(--secondary))]"><Zap size={20} /></div><p className="eyebrow">{service.category}</p><h3 className="mt-2 text-xl font-bold text-[hsl(var(--primary))]">{service.title}</h3><p className="mt-3 line-clamp-3 text-sm leading-6 text-[hsl(var(--muted-foreground))]">{service.description}</p><ArrowUpRight className="absolute bottom-7 right-7 text-[hsl(var(--primary)/.3)] transition-all group-hover:-translate-y-1 group-hover:text-[hsl(var(--secondary))]" size={19} /></article>;
+  return (
+    <article className="group overflow-hidden border border-[hsl(var(--border))] bg-[hsl(var(--card))] transition-transform hover:-translate-y-1" data-testid={`card-service-${service.id}`}>
+      <div className="relative flex h-40 items-center justify-center overflow-hidden bg-[hsl(var(--muted))]">
+        {service.image ? (
+          <img src={service.image} alt={service.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+        ) : (
+          <Zap size={34} className="text-[hsl(var(--secondary))]" />
+        )}
+        <span className="absolute right-4 top-4 bg-[hsl(var(--background)/.9)] px-2 py-1 text-[11px] font-bold text-[hsl(var(--secondary))]">
+          0{(index ?? 0) + 1}
+        </span>
+      </div>
+      <div className="relative min-h-[190px] p-7">
+        <p className="eyebrow">{service.category}</p>
+        <h3 className="mt-2 text-xl font-bold text-[hsl(var(--primary))]">{service.title}</h3>
+        <p className="mt-3 line-clamp-3 text-sm leading-6 text-[hsl(var(--muted-foreground))]">{service.description}</p>
+        <ArrowUpRight className="absolute bottom-7 right-7 text-[hsl(var(--primary)/.3)] transition-all group-hover:-translate-y-1 group-hover:text-[hsl(var(--secondary))]" size={19} />
+      </div>
+    </article>
+  );
 }
 function ProjectStrip({ projects }: { projects: Project[] }) {
   return <div className="grid gap-5 md:grid-cols-2">{projects.map((p, i) => <article key={p.id} className="group grid min-h-[240px] grid-cols-[.9fr_1.1fr] border border-[hsl(var(--primary-foreground)/.14)]" data-testid={`card-project-${p.id}`}><div className={cx('image-wash relative overflow-hidden', i % 2 ? 'bg-[hsl(var(--secondary)/.25)]' : 'bg-[hsl(var(--accent)/.16)]')}>{p.image ? <img src={p.image} alt="" className="h-full w-full object-cover mix-blend-multiply opacity-70" /> : <div className="absolute bottom-7 left-7 text-[hsl(var(--primary-foreground)/.35)]"><Factory size={58} strokeWidth={1} /></div>}</div><div className="flex flex-col justify-between p-6"><div><p className="text-[10px] font-bold uppercase tracking-widest text-[hsl(var(--accent))]">{p.category}</p><h3 className="mt-3 text-xl font-bold">{p.title}</h3><p className="mt-3 line-clamp-3 text-sm leading-6 text-[hsl(var(--primary-foreground)/.57)]">{p.description}</p></div><p className="mt-5 text-xs text-[hsl(var(--primary-foreground)/.42)]">{p.client} · {p.completionDate}</p></div></article>)}</div>;
 }
 function ClientRail({ clients }: { clients: Client[] }) {
   if (!clients.length) return <EmptyState label="Client stories will appear here as our network grows." />;
-  return <div className="mt-12 flex flex-wrap gap-3 border-t border-[hsl(var(--border))] pt-7">{clients.map(c => <div key={c.id} data-testid={`client-${c.id}`} className="flex items-center gap-3 border border-[hsl(var(--border))] bg-[hsl(var(--card)/.55)] px-4 py-3"><div className="flex h-8 w-8 items-center justify-center bg-[hsl(var(--primary))] text-xs font-bold text-[hsl(var(--accent))]">{c.name.slice(0, 2).toUpperCase()}</div><span className="text-xs font-semibold text-[hsl(var(--primary))]">{c.name}</span></div>)}</div>;
+  return <div className="mt-12 flex flex-wrap gap-3 border-t border-[hsl(var(--border))] pt-7">{clients.map(c => <div key={c.id} data-testid={`client-${c.id}`} className="flex items-center gap-3 border border-[hsl(var(--border))] bg-[hsl(var(--card)/.55)] px-4 py-3">{c.logo ? <img src={c.logo} alt={c.name} className="h-8 w-8 object-contain" /> : <div className="flex h-8 w-8 items-center justify-center bg-[hsl(var(--primary))] text-xs font-bold text-[hsl(var(--accent))]">{c.name.slice(0, 2).toUpperCase()}</div>}<span className="text-xs font-semibold text-[hsl(var(--primary))]">{c.name}</span></div>)}</div>;
 }
 
 function InteriorHero({ eyebrow, title, copy }: { eyebrow: string; title: string; copy: string }) {
@@ -198,7 +217,51 @@ function Projects() {
   const query = useListProjects({ query: { queryKey: ['/api/projects'] } });
   return <Shell><InteriorHero eyebrow="Project record" title="A track record built on getting the details right." copy="A selection of work delivered with care for organisations, communities and teams across Uganda and the region." /><main className="py-20 md:py-28"><PageContainer>{query.isLoading ? <LoadingState /> : query.isError ? <ErrorState onRetry={() => query.refetch()} /> : !query.data?.length ? <EmptyState label="Project stories are being prepared." /> : <div className="grid gap-6 md:grid-cols-2">{query.data.map((p, i) => <ProjectCard key={p.id} project={p} index={i} />)}</div>}</PageContainer></main></Shell>;
 }
-function ProjectCard({ project, index }: { project: Project; index: number }) { return <article data-testid={`card-project-full-${project.id}`} className={cx('group grid overflow-hidden border border-[hsl(var(--border))] bg-[hsl(var(--card))]', index % 3 === 0 ? 'md:col-span-2 md:grid-cols-[1.2fr_.8fr]' : 'md:grid-cols-[.8fr_1.2fr]')}><div className={cx('image-wash min-h-[220px] bg-[hsl(var(--primary)/.1)]', index % 3 === 1 && 'md:order-2')}>{project.image ? <img src={project.image} alt="" className="h-full min-h-[220px] w-full object-cover" /> : <div className="flex h-full min-h-[220px] items-center justify-center text-[hsl(var(--primary)/.25)]"><Building2 size={70} strokeWidth={1} /></div>}</div><div className="flex flex-col justify-between p-7 md:p-10"><div><p className="eyebrow">{project.category}</p><h2 className="display mt-4 text-3xl font-semibold text-[hsl(var(--primary))]">{project.title}</h2><p className="mt-4 max-w-lg text-sm leading-7 text-[hsl(var(--muted-foreground))]">{project.description}</p></div><div className="mt-10 flex flex-wrap gap-5 text-xs font-semibold text-[hsl(var(--muted-foreground))]"><span className="flex items-center gap-2"><Users size={14} className="text-[hsl(var(--secondary))]" />{project.client}</span><span className="flex items-center gap-2"><Clock3 size={14} className="text-[hsl(var(--secondary))]" />{project.completionDate}</span></div></div></article>; }
+function ProjectCard({ project, index }: { project: Project; index: number }) {
+  const gallery = project.images?.length ? project.images : project.image ? [project.image] : [];
+  const cover = project.image ?? gallery[0];
+  const thumbnails = gallery.filter((image) => image !== cover).slice(0, 4);
+
+  return (
+    <article
+      data-testid={`card-project-full-${project.id}`}
+      className={cx(
+        'group grid overflow-hidden border border-[hsl(var(--border))] bg-[hsl(var(--card))]',
+        index % 3 === 0 ? 'md:col-span-2 md:grid-cols-[1.2fr_.8fr]' : 'md:grid-cols-[.8fr_1.2fr]',
+      )}
+    >
+      <div className={cx('bg-[hsl(var(--primary)/.1)]', index % 3 === 1 && 'md:order-2')}>
+        {cover ? (
+          <div className="grid h-full min-h-[220px] grid-rows-[1fr_auto]">
+            <img src={cover} alt={project.title} className="h-full min-h-[220px] w-full object-cover" />
+            {thumbnails.length > 0 && (
+              <div className="grid grid-cols-4 gap-1 bg-[hsl(var(--background))] p-1">
+                {thumbnails.map((image) => (
+                  <img key={image} src={image} alt="" className="h-16 w-full object-cover" />
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="flex h-full min-h-[220px] items-center justify-center text-[hsl(var(--primary)/.25)]">
+            <Building2 size={70} strokeWidth={1} />
+          </div>
+        )}
+      </div>
+      <div className="flex flex-col justify-between p-7 md:p-10">
+        <div>
+          <p className="eyebrow">{project.category}</p>
+          <h2 className="display mt-4 text-3xl font-semibold text-[hsl(var(--primary))]">{project.title}</h2>
+          <p className="mt-4 max-w-lg text-sm leading-7 text-[hsl(var(--muted-foreground))]">{project.description}</p>
+        </div>
+        <div className="mt-10 flex flex-wrap gap-5 text-xs font-semibold text-[hsl(var(--muted-foreground))]">
+          <span className="flex items-center gap-2"><Users size={14} className="text-[hsl(var(--secondary))]" />{project.client}</span>
+          <span className="flex items-center gap-2"><Clock3 size={14} className="text-[hsl(var(--secondary))]" />{project.completionDate}</span>
+        </div>
+      </div>
+    </article>
+  );
+}
 
 function Products() {
   useDocumentMeta(

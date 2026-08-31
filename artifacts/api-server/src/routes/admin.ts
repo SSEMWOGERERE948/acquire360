@@ -171,6 +171,8 @@ router.post("/projects", async (req, res) => {
       .values({
         ...parsed.data,
         completionDate: toDateString(parsed.data.completionDate),
+        image: parsed.data.image ?? parsed.data.images?.[0] ?? null,
+        images: parsed.data.images ?? [],
       })
       .returning();
     res.status(201).json(CreateProjectResponse.parse(created));
@@ -191,7 +193,12 @@ router.put("/projects/:id", async (req, res) => {
   try {
     const [updated] = await db
       .update(projects)
-      .set({ ...body.data, completionDate: toDateString(body.data.completionDate) })
+      .set({
+        ...body.data,
+        completionDate: toDateString(body.data.completionDate),
+        image: body.data.image ?? body.data.images?.[0] ?? null,
+        images: body.data.images ?? [],
+      })
       .where(eq(projects.id, params.data.id))
       .returning();
 
