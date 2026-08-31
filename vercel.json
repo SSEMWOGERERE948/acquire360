@@ -1,0 +1,11 @@
+{
+  "installCommand": "pnpm install",
+  "buildCommand": "pnpm --filter @workspace/acquire-360-ventures run build",
+  "outputDirectory": "artifacts/acquire-360-ventures/dist/public",
+  "rewrites": [
+    {
+      "source": "/((?!api|uploads|assets).*)",
+      "destination": "/index.html"
+    }
+  ]
+}
