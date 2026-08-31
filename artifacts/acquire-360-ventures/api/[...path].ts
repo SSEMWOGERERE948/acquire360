@@ -5,5 +5,5 @@ export default function handler(req: any, res: any) {
     req.url = `/api${req.url.startsWith("/") ? req.url : `/${req.url}`}`;
   }
 
-  return app(req, res);
+  return app.handle(req, res);
 }
