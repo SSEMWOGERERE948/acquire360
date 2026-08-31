@@ -1,4 +1,4 @@
-import app from "../../api-server/src/app";
+import app from "../../api-server/src/app.js";
 
 export default function handler(req: any, res: any) {
   if (typeof req.url === "string" && !req.url.startsWith("/api") && !req.url.startsWith("/uploads")) {
