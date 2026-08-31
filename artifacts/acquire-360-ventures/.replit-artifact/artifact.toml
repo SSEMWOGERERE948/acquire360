@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Acquire 360 Ventures"
+description = "A polished procurement, supply, and project support website for Acquire 360 Ventures Ltd in Uganda, with services, experience, product catalogue, and quote request flows."
+version = "1.0.0"
+id = "artifacts/acquire-360-ventures"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 26205
+
+[services.development]
+run = "pnpm --filter @workspace/acquire-360-ventures run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/acquire-360-ventures", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/acquire-360-ventures/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "26205"
+BASE_PATH = "/"

@@ -1,22 +1,31 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Content, enquiry and admin API for Acquire 360 Ventures Ltd
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: content
+    description: Public website content
+  - name: enquiries
+    description: Customer enquiries
+  - name: auth
+    description: Admin authentication
+  - name: admin
+    description: Admin content management
+  - name: media
+    description: Media library
+security: []
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +33,934 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # ---------------------------------------------------------------------
+  # Public content
+  # ---------------------------------------------------------------------
+  /company:
+    get:
+      operationId: getCompanyProfile
+      tags: [content]
+      summary: Get the company profile
+      responses:
+        "200":
+          description: Company profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CompanyProfile"
+    put:
+      operationId: updateCompanyProfile
+      tags: [admin]
+      summary: Update the company profile
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompanyProfileInput"
+      responses:
+        "200":
+          description: Updated company profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CompanyProfile"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /services:
+    get:
+      operationId: listServices
+      tags: [content]
+      summary: List procurement services
+      responses:
+        "200":
+          description: Services
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Service"
+    post:
+      operationId: createService
+      tags: [admin]
+      summary: Create a service
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceInput"
+      responses:
+        "201":
+          description: Service created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Service"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /services/{id}:
+    put:
+      operationId: updateService
+      tags: [admin]
+      summary: Update a service
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceInput"
+      responses:
+        "200":
+          description: Service updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Service"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteService
+      tags: [admin]
+      summary: Delete a service
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Service deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /projects:
+    get:
+      operationId: listProjects
+      tags: [content]
+      summary: List completed projects
+      responses:
+        "200":
+          description: Projects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Project"
+    post:
+      operationId: createProject
+      tags: [admin]
+      summary: Create a project
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectInput"
+      responses:
+        "201":
+          description: Project created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /projects/{id}:
+    put:
+      operationId: updateProject
+      tags: [admin]
+      summary: Update a project
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectInput"
+      responses:
+        "200":
+          description: Project updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteProject
+      tags: [admin]
+      summary: Delete a project
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Project deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /products:
+    get:
+      operationId: listProducts
+      tags: [content]
+      summary: Search and filter the product catalogue
+      parameters:
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+    post:
+      operationId: createProduct
+      tags: [admin]
+      summary: Create a product
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductInput"
+      responses:
+        "201":
+          description: Product created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /products/{id}:
+    put:
+      operationId: updateProduct
+      tags: [admin]
+      summary: Update a product
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductInput"
+      responses:
+        "200":
+          description: Product updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteProduct
+      tags: [admin]
+      summary: Delete a product
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Product deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /team:
+    get:
+      operationId: listTeamMembers
+      tags: [content]
+      summary: List company team members
+      responses:
+        "200":
+          description: Team
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TeamMember"
+    post:
+      operationId: createTeamMember
+      tags: [admin]
+      summary: Create a team member
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TeamMemberInput"
+      responses:
+        "201":
+          description: Team member created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeamMember"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /team/{id}:
+    put:
+      operationId: updateTeamMember
+      tags: [admin]
+      summary: Update a team member
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TeamMemberInput"
+      responses:
+        "200":
+          description: Team member updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeamMember"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteTeamMember
+      tags: [admin]
+      summary: Delete a team member
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Team member deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /clients:
+    get:
+      operationId: listClients
+      tags: [content]
+      summary: List trusted clients
+      responses:
+        "200":
+          description: Clients
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Client"
+    post:
+      operationId: createClient
+      tags: [admin]
+      summary: Create a client
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClientInput"
+      responses:
+        "201":
+          description: Client created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Client"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /clients/{id}:
+    put:
+      operationId: updateClient
+      tags: [admin]
+      summary: Update a client
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClientInput"
+      responses:
+        "200":
+          description: Client updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Client"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteClient
+      tags: [admin]
+      summary: Delete a client
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Client deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /summary:
+    get:
+      operationId: getContentSummary
+      tags: [content]
+      summary: Get public content summary
+      responses:
+        "200":
+          description: Content totals
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContentSummary"
+
+  # ---------------------------------------------------------------------
+  # Enquiries (RFQ)
+  # ---------------------------------------------------------------------
+  /rfqs:
+    get:
+      operationId: listRfqs
+      tags: [admin]
+      summary: List quotation requests
+      security: [{ cookieAuth: [] }]
+      responses:
+        "200":
+          description: Enquiries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Rfq"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: createRfq
+      tags: [enquiries]
+      summary: Submit a request for quotation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RfqInput"
+      responses:
+        "201":
+          description: Enquiry created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Rfq"
+        "400":
+          description: Invalid enquiry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /rfqs/{id}:
+    patch:
+      operationId: updateRfqStatus
+      tags: [admin]
+      summary: Update a quotation request's status
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RfqStatusInput"
+      responses:
+        "200":
+          description: Enquiry updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Rfq"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /rfqs/attachments:
+    post:
+      operationId: uploadRfqAttachment
+      tags: [enquiries]
+      summary: Upload a specification document for a quotation request
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "201":
+          description: Attachment stored
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UploadResult"
+        "400":
+          description: Invalid upload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ---------------------------------------------------------------------
+  # Auth
+  # ---------------------------------------------------------------------
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Log in to the admin dashboard
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+      responses:
+        "200":
+          description: Authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthUser"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Log out of the admin dashboard
+      security: [{ cookieAuth: [] }]
+      responses:
+        "204":
+          description: Logged out
+  /auth/me:
+    get:
+      operationId: getCurrentUser
+      tags: [auth]
+      summary: Get the currently authenticated admin user
+      security: [{ cookieAuth: [] }]
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthUser"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ---------------------------------------------------------------------
+  # Media library
+  # ---------------------------------------------------------------------
+  /media:
+    get:
+      operationId: listMedia
+      tags: [media]
+      summary: List uploaded media assets
+      security: [{ cookieAuth: [] }]
+      responses:
+        "200":
+          description: Media assets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MediaAsset"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: uploadMedia
+      tags: [media]
+      summary: Upload an image or PDF document
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "201":
+          description: Media asset created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MediaAsset"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /media/{id}:
+    delete:
+      operationId: deleteMedia
+      tags: [media]
+      summary: Delete a media asset
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Media asset deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: a360_session
   schemas:
     HealthStatus:
       type: object
+      required: [status]
       properties:
         status:
           type: string
-      required:
-        - status
-
+    CompanyProfile:
+      type: object
+      required: [companyName, tagline, vision, mission, about, coreValues, phone, email]
+      properties:
+        companyName: { type: string }
+        tagline: { type: string }
+        vision: { type: string }
+        mission: { type: string }
+        about: { type: string }
+        coreValues:
+          type: array
+          items: { type: string }
+        phone: { type: string }
+        email: { type: string, format: email }
+    CompanyProfileInput:
+      allOf:
+        - $ref: "#/components/schemas/CompanyProfile"
+    Service:
+      type: object
+      required: [id, title, description, category, featured]
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        description: { type: string }
+        category: { type: string }
+        image: { type: ["string", "null"] }
+        featured: { type: boolean }
+    ServiceInput:
+      type: object
+      required: [title, description, category, featured]
+      properties:
+        title: { type: string, minLength: 1 }
+        description: { type: string, minLength: 1 }
+        category: { type: string, minLength: 1 }
+        image: { type: ["string", "null"] }
+        featured: { type: boolean }
+    Project:
+      type: object
+      required: [id, title, client, description, category, completionDate]
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        client: { type: string }
+        description: { type: string }
+        category: { type: string }
+        completionDate: { type: string, format: date }
+        image: { type: ["string", "null"] }
+    ProjectInput:
+      type: object
+      required: [title, client, description, category, completionDate]
+      properties:
+        title: { type: string, minLength: 1 }
+        client: { type: string, minLength: 1 }
+        description: { type: string, minLength: 1 }
+        category: { type: string, minLength: 1 }
+        completionDate: { type: string, format: date }
+        image: { type: ["string", "null"] }
+    Product:
+      type: object
+      required: [id, name, description, category, specifications]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        description: { type: string }
+        category: { type: string }
+        image: { type: ["string", "null"] }
+        specifications: { type: ["string", "null"] }
+        datasheet: { type: ["string", "null"] }
+    ProductInput:
+      type: object
+      required: [name, description, category]
+      properties:
+        name: { type: string, minLength: 1 }
+        description: { type: string, minLength: 1 }
+        category: { type: string, minLength: 1 }
+        image: { type: ["string", "null"] }
+        specifications: { type: ["string", "null"] }
+        datasheet: { type: ["string", "null"] }
+    TeamMember:
+      type: object
+      required: [id, name, position, bio]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        position: { type: string }
+        bio: { type: string }
+        image: { type: ["string", "null"] }
+    TeamMemberInput:
+      type: object
+      required: [name, position, bio]
+      properties:
+        name: { type: string, minLength: 1 }
+        position: { type: string, minLength: 1 }
+        bio: { type: string, minLength: 1 }
+        image: { type: ["string", "null"] }
+    Client:
+      type: object
+      required: [id, name, description]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        description: { type: string }
+        logo: { type: ["string", "null"] }
+    ClientInput:
+      type: object
+      required: [name, description]
+      properties:
+        name: { type: string, minLength: 1 }
+        description: { type: string }
+        logo: { type: ["string", "null"] }
+    ContentSummary:
+      type: object
+      required: [services, projects, products, clients, rfqs]
+      properties:
+        services: { type: integer }
+        projects: { type: integer }
+        products: { type: integer }
+        clients: { type: integer }
+        rfqs: { type: integer }
+    RfqInput:
+      type: object
+      required: [companyName, contactPerson, email, phone, product, quantity, description]
+      properties:
+        companyName: { type: string, minLength: 1 }
+        contactPerson: { type: string, minLength: 1 }
+        email: { type: string, format: email }
+        phone: { type: string, minLength: 1 }
+        product: { type: string, minLength: 1 }
+        quantity: { type: string, minLength: 1 }
+        description: { type: string, minLength: 1 }
+        file: { type: ["string", "null"] }
+    Rfq:
+      allOf:
+        - $ref: "#/components/schemas/RfqInput"
+        - type: object
+          required: [id, createdAt, status]
+          properties:
+            id: { type: integer }
+            createdAt: { type: string, format: date-time }
+            status: { type: string }
+    RfqStatusInput:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [new, reviewing, quoted, closed]
+    UploadResult:
+      type: object
+      required: [url]
+      properties:
+        url: { type: string }
+    LoginInput:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, minLength: 1 }
+    AuthUser:
+      type: object
+      required: [id, name, email, role]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        email: { type: string, format: email }
+        role: { type: string }
+    MediaAsset:
+      type: object
+      required: [id, filename, url, mimeType, size, kind, createdAt]
+      properties:
+        id: { type: integer }
+        filename: { type: string }
+        url: { type: string }
+        mimeType: { type: string }
+        size: { type: integer }
+        kind: { type: string, enum: [image, document] }
+        createdAt: { type: string, format: date-time }
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error: { type: string }
