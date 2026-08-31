@@ -44,7 +44,7 @@ app.use("/api", (_req, res, next) => {
   next();
 });
 app.use("/uploads", express.static(path.resolve(process.cwd(), "public/uploads")));
-app.get(/^\/uploads\/(.+)$/, async (req, res) => {
+async function serveUploadedObject(req: express.Request, res: express.Response) {
   const key = req.params[0];
 
   try {
@@ -61,7 +61,10 @@ app.get(/^\/uploads\/(.+)$/, async (req, res) => {
     req.log.error({ err, key }, "Failed to serve uploaded object");
     res.status(404).end();
   }
-});
+}
+
+app.get(/^\/uploads\/(.+)$/, serveUploadedObject);
+app.get(/^\/api\/uploads\/(.+)$/, serveUploadedObject);
 
 app.use("/api", router);
 
