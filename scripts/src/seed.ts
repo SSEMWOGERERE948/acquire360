@@ -40,6 +40,7 @@ function loadApiEnv() {
 
 loadApiEnv();
 
+const { eq } = await import("drizzle-orm");
 const { db, pool } = await import("@workspace/db");
 const {
   clients,
@@ -344,6 +345,20 @@ async function seedProducts() {
 
 async function seedAdminUser() {
   const existing = await db.select({ id: users.id }).from(users).limit(1);
+  if (existing.length > 0 && process.env.SEED_ADMIN_PASSWORD) {
+    const email = process.env.SEED_ADMIN_EMAIL ?? "admin@acquire360ventures.com";
+    const passwordHash = await bcrypt.hash(process.env.SEED_ADMIN_PASSWORD, 10);
+    await db
+      .update(users)
+      .set({
+        email: email.toLowerCase(),
+        password: passwordHash,
+      })
+      .where(eq(users.id, existing[0].id));
+    console.log(`Updated admin login for "${email}".`);
+    return;
+  }
+
   if (existing.length > 0) {
     console.log("Skipping admin user — already seeded.");
     return;

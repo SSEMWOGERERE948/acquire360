@@ -41,10 +41,12 @@ export function verifySession(token: string): SessionPayload | null {
 }
 
 export function sessionCookieOptions() {
+  const crossSite = process.env.COOKIE_SAME_SITE === "none";
+
   return {
     httpOnly: true,
-    sameSite: "lax" as const,
-    secure: process.env.NODE_ENV === "production",
+    sameSite: crossSite ? ("none" as const) : ("lax" as const),
+    secure: crossSite || process.env.NODE_ENV === "production",
     maxAge: SESSION_TTL_SECONDS * 1000,
     path: "/",
   };

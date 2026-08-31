@@ -4,6 +4,10 @@
   "outputDirectory": "artifacts/acquire-360-ventures/dist/public",
   "rewrites": [
     {
+      "source": "/uploads/(.*)",
+      "destination": "/api/uploads/$1"
+    },
+    {
       "source": "/((?!api|uploads|assets).*)",
       "destination": "/index.html"
     }
