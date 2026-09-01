@@ -5,6 +5,7 @@ import { db } from "@workspace/db";
 import { mediaAssets } from "@workspace/db/schema";
 import { requireAuth } from "../middlewares/require-auth";
 import { assetKindFor, MAX_IMAGES, upload } from "../lib/upload";
+import { logger } from "../lib/logger";
 import { deleteObject, publicUrlForObject, publicUrlForStoredUrl, uploadObject } from "../lib/storage";
 
 const router: IRouter = Router();
@@ -21,7 +22,7 @@ router.get("/media", requireAuth, async (req, res) => {
       ),
     );
   } catch (err) {
-    req.log.error({ err }, "Failed to load media assets");
+    logger.error({ err }, "Failed to load media assets");
     res.status(500).json({ error: "Unable to load media assets" });
   }
 });
@@ -64,7 +65,7 @@ router.post("/media", requireAuth, upload.single("file"), async (req, res) => {
       .returning();
     res.status(201).json(UploadMediaResponse.parse(created));
   } catch (err) {
-    req.log.error({ err }, "Failed to save media asset");
+    logger.error({ err }, "Failed to save media asset");
     res.status(500).json({ error: "Unable to save uploaded file" });
   }
 });
@@ -88,11 +89,11 @@ router.delete("/media/:id", requireAuth, async (req, res) => {
     }
 
     await deleteObject(deleted.objectKey).catch((err) => {
-      req.log.error({ err }, "Failed to delete media object");
+      logger.error({ err }, "Failed to delete media object");
     });
     res.status(204).end();
   } catch (err) {
-    req.log.error({ err }, "Failed to delete media asset");
+    logger.error({ err }, "Failed to delete media asset");
     res.status(500).json({ error: "Unable to delete media asset" });
   }
 });

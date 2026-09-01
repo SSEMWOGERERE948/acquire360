@@ -25,6 +25,7 @@ import {
   teamMembers,
 } from "@workspace/db/schema";
 import { upload } from "../lib/upload";
+import { logger } from "../lib/logger";
 import { publicUrlForStoredUrl, uploadObject } from "../lib/storage";
 
 const router: IRouter = Router();
@@ -44,7 +45,7 @@ router.get("/company", async (req, res) => {
 
     res.json(GetCompanyProfileResponse.parse(profile));
   } catch (err) {
-    req.log.error({ err }, "Failed to load company profile");
+    logger.error({ err }, "Failed to load company profile");
     res.status(500).json({ error: "Unable to load company profile" });
   }
 });
@@ -54,7 +55,7 @@ router.get("/services", async (req, res) => {
     const data = await db.select().from(services).orderBy(asc(services.id));
     res.json(ListServicesResponse.parse(data.map((item) => ({ ...item, image: publicUrlForStoredUrl(item.image) }))));
   } catch (err) {
-    req.log.error({ err }, "Failed to load services");
+    logger.error({ err }, "Failed to load services");
     res.status(500).json({ error: "Unable to load services" });
   }
 });
@@ -72,7 +73,7 @@ router.get("/projects", async (req, res) => {
       ),
     );
   } catch (err) {
-    req.log.error({ err }, "Failed to load projects");
+    logger.error({ err }, "Failed to load projects");
     res.status(500).json({ error: "Unable to load projects" });
   }
 });
@@ -113,7 +114,7 @@ router.get("/products", async (req, res) => {
       ),
     );
   } catch (err) {
-    req.log.error({ err }, "Failed to load products");
+    logger.error({ err }, "Failed to load products");
     res.status(500).json({ error: "Unable to load products" });
   }
 });
@@ -123,7 +124,7 @@ router.get("/team", async (req, res) => {
     const data = await db.select().from(teamMembers).orderBy(asc(teamMembers.id));
     res.json(ListTeamMembersResponse.parse(data.map((item) => ({ ...item, image: publicUrlForStoredUrl(item.image) }))));
   } catch (err) {
-    req.log.error({ err }, "Failed to load team");
+    logger.error({ err }, "Failed to load team");
     res.status(500).json({ error: "Unable to load team" });
   }
 });
@@ -133,7 +134,7 @@ router.get("/clients", async (req, res) => {
     const data = await db.select().from(clients).orderBy(asc(clients.id));
     res.json(ListClientsResponse.parse(data.map((item) => ({ ...item, logo: publicUrlForStoredUrl(item.logo) }))));
   } catch (err) {
-    req.log.error({ err }, "Failed to load clients");
+    logger.error({ err }, "Failed to load clients");
     res.status(500).json({ error: "Unable to load clients" });
   }
 });
@@ -158,7 +159,7 @@ router.get("/summary", async (req, res) => {
       }),
     );
   } catch (err) {
-    req.log.error({ err }, "Failed to load content summary");
+    logger.error({ err }, "Failed to load content summary");
     res.status(500).json({ error: "Unable to load content summary" });
   }
 });
@@ -178,7 +179,7 @@ router.post("/rfqs/attachments", upload.single("file"), async (req, res) => {
     );
     res.status(201).json(UploadRfqAttachmentResponse.parse({ url: uploaded.url }));
   } catch (err) {
-    req.log.error({ err }, "Failed to upload RFQ attachment");
+    logger.error({ err }, "Failed to upload RFQ attachment");
     res.status(400).json({ error: "Unable to upload the file. Please try again." });
   }
 });
@@ -198,7 +199,7 @@ router.post("/rfqs", async (req, res) => {
     const [created] = await db.insert(rfqs).values(input).returning();
     res.status(201).json(CreateRfqResponse.parse(created));
   } catch (err) {
-    req.log.error({ err }, "Failed to create RFQ");
+    logger.error({ err }, "Failed to create RFQ");
     res.status(500).json({ error: "Unable to submit quote request" });
   }
 });

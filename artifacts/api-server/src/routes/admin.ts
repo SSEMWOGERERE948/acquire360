@@ -48,6 +48,7 @@ import {
   services,
   teamMembers,
 } from "@workspace/db/schema";
+import { logger } from "../lib/logger";
 import { requireAuth } from "../middlewares/require-auth";
 
 const router: IRouter = Router();
@@ -81,7 +82,7 @@ router.put("/company", async (req, res) => {
 
     res.json(UpdateCompanyProfileResponse.parse(saved));
   } catch (err) {
-    req.log.error({ err }, "Failed to update company profile");
+    logger.error({ err }, "Failed to update company profile");
     res.status(500).json({ error: "Unable to update company profile" });
   }
 });
@@ -100,7 +101,7 @@ router.post("/services", async (req, res) => {
     const [created] = await db.insert(services).values(parsed.data).returning();
     res.status(201).json(CreateServiceResponse.parse(created));
   } catch (err) {
-    req.log.error({ err }, "Failed to create service");
+    logger.error({ err }, "Failed to create service");
     res.status(500).json({ error: "Unable to create service" });
   }
 });
@@ -126,7 +127,7 @@ router.put("/services/:id", async (req, res) => {
     }
     res.json(UpdateServiceResponse.parse(updated));
   } catch (err) {
-    req.log.error({ err }, "Failed to update service");
+    logger.error({ err }, "Failed to update service");
     res.status(500).json({ error: "Unable to update service" });
   }
 });
@@ -150,7 +151,7 @@ router.delete("/services/:id", async (req, res) => {
     }
     res.status(204).end();
   } catch (err) {
-    req.log.error({ err }, "Failed to delete service");
+    logger.error({ err }, "Failed to delete service");
     res.status(500).json({ error: "Unable to delete service" });
   }
 });
@@ -177,7 +178,7 @@ router.post("/projects", async (req, res) => {
       .returning();
     res.status(201).json(CreateProjectResponse.parse(created));
   } catch (err) {
-    req.log.error({ err }, "Failed to create project");
+    logger.error({ err }, "Failed to create project");
     res.status(500).json({ error: "Unable to create project" });
   }
 });
@@ -208,7 +209,7 @@ router.put("/projects/:id", async (req, res) => {
     }
     res.json(UpdateProjectResponse.parse(updated));
   } catch (err) {
-    req.log.error({ err }, "Failed to update project");
+    logger.error({ err }, "Failed to update project");
     res.status(500).json({ error: "Unable to update project" });
   }
 });
@@ -232,7 +233,7 @@ router.delete("/projects/:id", async (req, res) => {
     }
     res.status(204).end();
   } catch (err) {
-    req.log.error({ err }, "Failed to delete project");
+    logger.error({ err }, "Failed to delete project");
     res.status(500).json({ error: "Unable to delete project" });
   }
 });
@@ -251,7 +252,7 @@ router.post("/products", async (req, res) => {
     const [created] = await db.insert(products).values(parsed.data).returning();
     res.status(201).json(CreateProductResponse.parse(created));
   } catch (err) {
-    req.log.error({ err }, "Failed to create product");
+    logger.error({ err }, "Failed to create product");
     res.status(500).json({ error: "Unable to create product" });
   }
 });
@@ -277,7 +278,7 @@ router.put("/products/:id", async (req, res) => {
     }
     res.json(UpdateProductResponse.parse(updated));
   } catch (err) {
-    req.log.error({ err }, "Failed to update product");
+    logger.error({ err }, "Failed to update product");
     res.status(500).json({ error: "Unable to update product" });
   }
 });
@@ -301,7 +302,7 @@ router.delete("/products/:id", async (req, res) => {
     }
     res.status(204).end();
   } catch (err) {
-    req.log.error({ err }, "Failed to delete product");
+    logger.error({ err }, "Failed to delete product");
     res.status(500).json({ error: "Unable to delete product" });
   }
 });
@@ -320,7 +321,7 @@ router.post("/team", async (req, res) => {
     const [created] = await db.insert(teamMembers).values(parsed.data).returning();
     res.status(201).json(CreateTeamMemberResponse.parse(created));
   } catch (err) {
-    req.log.error({ err }, "Failed to create team member");
+    logger.error({ err }, "Failed to create team member");
     res.status(500).json({ error: "Unable to create team member" });
   }
 });
@@ -346,7 +347,7 @@ router.put("/team/:id", async (req, res) => {
     }
     res.json(UpdateTeamMemberResponse.parse(updated));
   } catch (err) {
-    req.log.error({ err }, "Failed to update team member");
+    logger.error({ err }, "Failed to update team member");
     res.status(500).json({ error: "Unable to update team member" });
   }
 });
@@ -370,7 +371,7 @@ router.delete("/team/:id", async (req, res) => {
     }
     res.status(204).end();
   } catch (err) {
-    req.log.error({ err }, "Failed to delete team member");
+    logger.error({ err }, "Failed to delete team member");
     res.status(500).json({ error: "Unable to delete team member" });
   }
 });
@@ -389,7 +390,7 @@ router.post("/clients", async (req, res) => {
     const [created] = await db.insert(clients).values(parsed.data).returning();
     res.status(201).json(CreateClientResponse.parse(created));
   } catch (err) {
-    req.log.error({ err }, "Failed to create client");
+    logger.error({ err }, "Failed to create client");
     res.status(500).json({ error: "Unable to create client" });
   }
 });
@@ -415,7 +416,7 @@ router.put("/clients/:id", async (req, res) => {
     }
     res.json(UpdateClientResponse.parse(updated));
   } catch (err) {
-    req.log.error({ err }, "Failed to update client");
+    logger.error({ err }, "Failed to update client");
     res.status(500).json({ error: "Unable to update client" });
   }
 });
@@ -439,7 +440,7 @@ router.delete("/clients/:id", async (req, res) => {
     }
     res.status(204).end();
   } catch (err) {
-    req.log.error({ err }, "Failed to delete client");
+    logger.error({ err }, "Failed to delete client");
     res.status(500).json({ error: "Unable to delete client" });
   }
 });
@@ -452,7 +453,7 @@ router.get("/rfqs", async (req, res) => {
     const data = await db.select().from(rfqs).orderBy(desc(rfqs.createdAt));
     res.json(ListRfqsResponse.parse(data));
   } catch (err) {
-    req.log.error({ err }, "Failed to load enquiries");
+    logger.error({ err }, "Failed to load enquiries");
     res.status(500).json({ error: "Unable to load enquiries" });
   }
 });
@@ -478,7 +479,7 @@ router.patch("/rfqs/:id", async (req, res) => {
     }
     res.json(UpdateRfqStatusResponse.parse(updated));
   } catch (err) {
-    req.log.error({ err }, "Failed to update enquiry");
+    logger.error({ err }, "Failed to update enquiry");
     res.status(500).json({ error: "Unable to update enquiry" });
   }
 });

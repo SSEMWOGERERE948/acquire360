@@ -9,6 +9,7 @@ import {
   signSession,
   verifyPassword,
 } from "../lib/auth";
+import { logger } from "../lib/logger";
 import { requireAuth } from "../middlewares/require-auth";
 
 const router: IRouter = Router();
@@ -44,7 +45,7 @@ router.post("/auth/login", async (req, res) => {
       }),
     );
   } catch (err) {
-    req.log.error({ err }, "Login failed");
+    logger.error({ err }, "Login failed");
     res.status(401).json({ error: "Invalid email or password" });
   }
 });
@@ -76,7 +77,7 @@ router.get("/auth/me", requireAuth, async (req, res) => {
       }),
     );
   } catch (err) {
-    req.log.error({ err }, "Failed to load current user");
+    logger.error({ err }, "Failed to load current user");
     res.status(401).json({ error: "Authentication required" });
   }
 });

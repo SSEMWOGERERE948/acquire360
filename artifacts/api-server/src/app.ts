@@ -1,4 +1,9 @@
-import express, { type Express } from "express";
+import express, {
+  type NextFunction,
+  type Request,
+  type RequestHandler,
+  type Response,
+} from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import pinoHttp from "pino-http";
@@ -8,7 +13,7 @@ import router from "./routes";
 import { logger } from "./lib/logger";
 import { getObjectStream } from "./lib/storage";
 
-const app: Express = express();
+const app = express();
 
 app.disable("etag");
 
@@ -40,13 +45,23 @@ app.use(
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use("/api", (_req, res, next) => {
+const noStoreApiResponses: RequestHandler = (
+  _req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   res.setHeader("Cache-Control", "no-store");
   next();
-});
+};
+
+app.use("/api", noStoreApiResponses);
 app.use("/uploads", express.static(path.resolve(process.cwd(), "public/uploads")));
-async function serveUploadedObject(req: express.Request, res: express.Response) {
-  const key = req.params[0];
+const serveUploadedObject: RequestHandler = async (req: Request, res: Response) => {
+  const key = (req.params as Record<string, string | undefined>)["0"];
+  if (!key) {
+    res.status(404).end();
+    return;
+  }
 
   try {
     const object = await getObjectStream(key);
@@ -59,10 +74,10 @@ async function serveUploadedObject(req: express.Request, res: express.Response) 
     res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
     object.body.pipe(res);
   } catch (err) {
-    req.log.error({ err, key }, "Failed to serve uploaded object");
+    logger.error({ err, key }, "Failed to serve uploaded object");
     res.status(404).end();
   }
-}
+};
 
 app.get(/^\/uploads\/(.+)$/, serveUploadedObject);
 app.get(/^\/api\/uploads\/(.+)$/, serveUploadedObject);
