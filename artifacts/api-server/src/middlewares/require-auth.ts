@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { SESSION_COOKIE_NAME, verifySession, type SessionPayload } from "../lib/auth";
+import { SESSION_COOKIE_NAME, verifySession, type SessionPayload } from "../lib/auth.js";
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace

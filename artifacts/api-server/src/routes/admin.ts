@@ -48,8 +48,8 @@ import {
   services,
   teamMembers,
 } from "@workspace/db/schema";
-import { logger } from "../lib/logger";
-import { requireAuth } from "../middlewares/require-auth";
+import { logger } from "../lib/logger.js";
+import { requireAuth } from "../middlewares/require-auth.js";
 
 const router: IRouter = Router();
 router.use(requireAuth);

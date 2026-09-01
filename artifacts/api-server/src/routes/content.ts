@@ -24,9 +24,9 @@ import {
   services,
   teamMembers,
 } from "@workspace/db/schema";
-import { upload } from "../lib/upload";
-import { logger } from "../lib/logger";
-import { publicUrlForStoredUrl, uploadObject } from "../lib/storage";
+import { upload } from "../lib/upload.js";
+import { logger } from "../lib/logger.js";
+import { publicUrlForStoredUrl, uploadObject } from "../lib/storage.js";
 
 const router: IRouter = Router();
 

@@ -8,9 +8,9 @@ import {
   sessionCookieOptions,
   signSession,
   verifyPassword,
-} from "../lib/auth";
-import { logger } from "../lib/logger";
-import { requireAuth } from "../middlewares/require-auth";
+} from "../lib/auth.js";
+import { logger } from "../lib/logger.js";
+import { requireAuth } from "../middlewares/require-auth.js";
 
 const router: IRouter = Router();
 

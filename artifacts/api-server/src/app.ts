@@ -1,17 +1,13 @@
-import express, {
-  type NextFunction,
-  type Request,
-  type RequestHandler,
-  type Response,
-} from "express";
-import cookieParser from "cookie-parser";
-import cors from "cors";
-import pinoHttp from "pino-http";
+import express = require("express");
+import type { NextFunction, Request, RequestHandler, Response } from "express";
+import cookieParser = require("cookie-parser");
+import cors = require("cors");
+import pinoHttp = require("pino-http");
 import path from "node:path";
 import type { RequestListener } from "node:http";
-import router from "./routes";
-import { logger } from "./lib/logger";
-import { getObjectStream } from "./lib/storage";
+import router from "./routes/index.js";
+import { logger } from "./lib/logger.js";
+import { getObjectStream } from "./lib/storage.js";
 
 const app = express();
 

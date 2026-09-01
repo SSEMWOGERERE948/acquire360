@@ -3,10 +3,10 @@ import { Router, type IRouter } from "express";
 import { DeleteMediaParams, ListMediaResponse, UploadMediaResponse } from "@workspace/api-zod";
 import { db } from "@workspace/db";
 import { mediaAssets } from "@workspace/db/schema";
-import { requireAuth } from "../middlewares/require-auth";
-import { assetKindFor, MAX_IMAGES, upload } from "../lib/upload";
-import { logger } from "../lib/logger";
-import { deleteObject, publicUrlForObject, publicUrlForStoredUrl, uploadObject } from "../lib/storage";
+import { requireAuth } from "../middlewares/require-auth.js";
+import { assetKindFor, MAX_IMAGES, upload } from "../lib/upload.js";
+import { logger } from "../lib/logger.js";
+import { deleteObject, publicUrlForObject, publicUrlForStoredUrl, uploadObject } from "../lib/storage.js";
 
 const router: IRouter = Router();
 
