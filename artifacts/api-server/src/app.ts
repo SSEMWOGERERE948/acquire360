@@ -70,7 +70,7 @@ app.get(/^\/api\/uploads\/(.+)$/, serveUploadedObject);
 app.use("/api", router);
 
 export const requestListener: RequestListener = (req, res) => {
-  return (app as unknown as { handle: RequestListener }).handle(req, res);
+  (app as unknown as { handle: RequestListener }).handle(req, res);
 };
 
 export default app;
