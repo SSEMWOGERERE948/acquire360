@@ -1,4 +1,4 @@
-const rawApiBaseUrl = import.meta.env.API_BASE_URL as string | undefined;
+const rawApiBaseUrl = 'https://api.acquire360ventures.com';
 
 export const apiBaseUrl = rawApiBaseUrl?.replace(/\/+$/, '') ?? null;
 
