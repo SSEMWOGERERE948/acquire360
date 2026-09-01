@@ -1,5 +1,4 @@
 import express = require("express");
-import type { NextFunction, Request, RequestHandler, Response } from "express";
 import cookieParser = require("cookie-parser");
 import cors = require("cors");
 import pinoHttp = require("pino-http");
@@ -11,20 +10,36 @@ import { getObjectStream } from "./lib/storage.js";
 
 const app = express();
 
+type HeaderResponse = {
+  setHeader(name: string, value: string | number | readonly string[]): void;
+};
+
+type ExpressLikeResponse = HeaderResponse &
+  NodeJS.WritableStream & {
+  type(contentType: string): void;
+  status(code: number): { end(): void };
+};
+
+type RegexRouteRequest = {
+  params?: Record<string, string | undefined>;
+};
+
+type ExpressHandler = (...args: any[]) => void | Promise<void>;
+
 app.disable("etag");
 
 app.use(
   pinoHttp({
     logger,
     serializers: {
-      req(req) {
+      req(req: { id?: unknown; method?: string; url?: string }) {
         return {
           id: req.id,
           method: req.method,
           url: req.url?.split("?")[0],
         };
       },
-      res(res) {
+      res(res: { statusCode?: number }) {
         return {
           statusCode: res.statusCode,
         };
@@ -41,19 +56,19 @@ app.use(
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-const noStoreApiResponses: RequestHandler = (
-  _req: Request,
-  res: Response,
-  next: NextFunction,
+const noStoreApiResponses = (
+  _req: unknown,
+  res: HeaderResponse,
+  next: () => void,
 ) => {
   res.setHeader("Cache-Control", "no-store");
   next();
 };
 
-app.use("/api", noStoreApiResponses);
+app.use("/api", noStoreApiResponses as ExpressHandler);
 app.use("/uploads", express.static(path.resolve(process.cwd(), "public/uploads")));
-const serveUploadedObject: RequestHandler = async (req: Request, res: Response) => {
-  const key = (req.params as Record<string, string | undefined>)["0"];
+const serveUploadedObject = async (req: RegexRouteRequest, res: ExpressLikeResponse) => {
+  const key = req.params?.["0"];
   if (!key) {
     res.status(404).end();
     return;
@@ -75,8 +90,8 @@ const serveUploadedObject: RequestHandler = async (req: Request, res: Response) 
   }
 };
 
-app.get(/^\/uploads\/(.+)$/, serveUploadedObject);
-app.get(/^\/api\/uploads\/(.+)$/, serveUploadedObject);
+app.get(/^\/uploads\/(.+)$/, serveUploadedObject as ExpressHandler);
+app.get(/^\/api\/uploads\/(.+)$/, serveUploadedObject as ExpressHandler);
 
 app.use("/api", router);
 
