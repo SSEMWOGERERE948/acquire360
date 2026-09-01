@@ -1,7 +1,7 @@
-import express = require("express");
-import cookieParser = require("cookie-parser");
-import cors = require("cors");
-import pinoHttp = require("pino-http");
+import express from "express";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import pinoHttp from "pino-http";
 import path from "node:path";
 import type { RequestListener } from "node:http";
 import router from "./routes/index.js";
