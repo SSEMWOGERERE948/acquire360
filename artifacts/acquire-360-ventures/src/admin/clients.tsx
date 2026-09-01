@@ -31,7 +31,7 @@ function toBody(values: FieldValues) {
 }
 
 export function AdminClients() {
-  useDocumentMeta('Manage clients', 'Create, edit and remove trusted client listings.');
+  useDocumentMeta('Manage clientale', 'Create, edit and remove trusted client listings.');
   const list = useListClients({ query: { queryKey: ['/api/clients'] } });
   const create = useCreateClient();
   const update = useUpdateClient();
