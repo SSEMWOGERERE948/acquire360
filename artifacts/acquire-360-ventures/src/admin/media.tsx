@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
 import { useDocumentMeta } from '@/lib/use-document-meta';
 import { apiErrorMessage } from '@/lib/api-error';
+import { apiAssetUrl } from '@/lib/api-base-url';
 
 const MAX_IMAGES = 20;
 
@@ -125,7 +126,7 @@ export function AdminMedia() {
             <div key={asset.id} className="border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-3" data-testid={`card-media-${asset.id}`}>
               <div className="flex h-28 items-center justify-center overflow-hidden bg-[hsl(var(--muted))]">
                 {asset.kind === 'image' ? (
-                  <img src={asset.url} alt={asset.filename} className="h-full w-full object-cover" />
+                  <img src={apiAssetUrl(asset.url)} alt={asset.filename} className="h-full w-full object-cover" />
                 ) : (
                   <FileText size={32} className="text-[hsl(var(--primary)/.4)]" />
                 )}
@@ -135,7 +136,7 @@ export function AdminMedia() {
               </p>
               <p className="text-[10px] text-[hsl(var(--muted-foreground))]">{formatSize(asset.size)}</p>
               <div className="mt-2 flex items-center justify-between">
-                <a href={asset.url} target="_blank" rel="noreferrer" className="text-[10px] font-bold uppercase tracking-wider text-[hsl(var(--secondary))]">
+                <a href={apiAssetUrl(asset.url)} target="_blank" rel="noreferrer" className="text-[10px] font-bold uppercase tracking-wider text-[hsl(var(--secondary))]">
                   Open
                 </a>
                 <Button size="icon" variant="ghost" onClick={() => handleDelete(asset.id)} disabled={deletingId === asset.id} data-testid={`button-media-delete-${asset.id}`}>

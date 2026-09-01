@@ -1,16 +1,7 @@
 {
-  "buildCommand": "cd ../.. && pnpm --filter @workspace/api-server run build && pnpm --filter @workspace/acquire-360-ventures run build",
+  "buildCommand": "pnpm run build",
   "outputDirectory": "dist/public",
-  "functions": {
-    "api/[...path].js": {
-      "includeFiles": "../api-server/dist/**"
-    }
-  },
   "rewrites": [
-    {
-      "source": "/uploads/(.*)",
-      "destination": "/api/uploads/$1"
-    },
     {
       "source": "/((?!api|uploads|assets).*)",
       "destination": "/index.html"

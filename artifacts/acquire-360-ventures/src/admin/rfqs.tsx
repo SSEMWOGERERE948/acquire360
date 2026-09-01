@@ -1,5 +1,6 @@
 import { useListRfqs, useUpdateRfqStatus } from '@workspace/api-client-react';
 import type { Rfq } from '@workspace/api-client-react';
+import { apiAssetUrl } from '@/lib/api-base-url';
 import {
   Select,
   SelectContent,
@@ -94,7 +95,7 @@ export function AdminRfqs() {
                   <TableCell className="text-xs">{new Date(rfq.createdAt).toLocaleDateString()}</TableCell>
                   <TableCell>
                     {rfq.file ? (
-                      <a href={rfq.file} target="_blank" rel="noreferrer" className="text-xs font-bold text-[hsl(var(--secondary))]">
+                      <a href={apiAssetUrl(rfq.file)} target="_blank" rel="noreferrer" className="text-xs font-bold text-[hsl(var(--secondary))]">
                         View file
                       </a>
                     ) : (

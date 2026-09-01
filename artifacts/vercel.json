@@ -1,17 +1,8 @@
 {
   "installCommand": "cd .. && pnpm install",
-  "buildCommand": "cd .. && pnpm --filter @workspace/api-server run build && pnpm --filter @workspace/acquire-360-ventures run build",
+  "buildCommand": "cd .. && pnpm --filter @workspace/acquire-360-ventures run build",
   "outputDirectory": "acquire-360-ventures/dist/public",
-  "functions": {
-    "api/[...path].js": {
-      "includeFiles": "api-server/dist/**"
-    }
-  },
   "rewrites": [
-    {
-      "source": "/uploads/(.*)",
-      "destination": "/api/uploads/$1"
-    },
     {
       "source": "/((?!api|uploads|assets).*)",
       "destination": "/index.html"

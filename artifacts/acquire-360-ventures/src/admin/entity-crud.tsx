@@ -31,6 +31,7 @@ import {
 } from '@/components/ui/table';
 import { toast } from '@/hooks/use-toast';
 import { apiErrorMessage } from '@/lib/api-error';
+import { apiAssetUrl } from '@/lib/api-base-url';
 
 export type FieldValues = Record<string, string>;
 
@@ -118,7 +119,7 @@ function UploadField({
         />
       </div>
       {kind === 'image' && value && (
-        <img src={value} alt="Preview" className="h-20 w-20 rounded border border-border object-cover" />
+        <img src={apiAssetUrl(value)} alt="Preview" className="h-20 w-20 rounded border border-border object-cover" />
       )}
       <Dialog open={pickerOpen} onOpenChange={setPickerOpen}>
         <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-3xl">
@@ -147,7 +148,7 @@ function UploadField({
                 >
                   <div className="flex h-28 items-center justify-center overflow-hidden bg-[hsl(var(--muted))]">
                     {kind === 'image' ? (
-                      <img src={asset.url} alt={asset.filename} className="h-full w-full object-cover" />
+                      <img src={apiAssetUrl(asset.url)} alt={asset.filename} className="h-full w-full object-cover" />
                     ) : (
                       <FileText size={32} className="text-[hsl(var(--primary)/.45)]" />
                     )}
@@ -193,7 +194,7 @@ function MultiImageField({
         <div className="grid grid-cols-3 gap-2">
           {urls.map((url) => (
             <div key={url} className="relative overflow-hidden border border-[hsl(var(--border))] bg-[hsl(var(--muted))]">
-              <img src={url} alt="" className="h-20 w-full object-cover" />
+              <img src={apiAssetUrl(url)} alt="" className="h-20 w-full object-cover" />
               <Button
                 type="button"
                 size="icon"
@@ -241,7 +242,7 @@ function MultiImageField({
                     data-testid={`button-pick-project-image-${asset.id}`}
                   >
                     <div className="flex h-28 items-center justify-center overflow-hidden bg-[hsl(var(--muted))]">
-                      <img src={asset.url} alt={asset.filename} className="h-full w-full object-cover" />
+                      <img src={apiAssetUrl(asset.url)} alt={asset.filename} className="h-full w-full object-cover" />
                     </div>
                     <p className="mt-2 truncate text-xs font-semibold text-[hsl(var(--primary))]" title={asset.filename}>
                       {selected ? 'Selected - ' : ''}{asset.filename}
