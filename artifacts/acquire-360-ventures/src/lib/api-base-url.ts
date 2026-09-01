@@ -1,4 +1,7 @@
-const rawApiBaseUrl = 'https://api.acquire360ventures.com';
+const rawApiBaseUrl =
+  import.meta.env.VITE_API_URL ||
+  import.meta.env.VITE_API_BASE_URL ||
+  'https://api.acquire360ventures.com';
 
 export const apiBaseUrl = rawApiBaseUrl?.replace(/\/+$/, '') ?? null;
 
@@ -7,9 +10,13 @@ export function apiAssetUrl(url: string | null | undefined): string | undefined 
     return undefined;
   }
 
-  if (!apiBaseUrl || !url.startsWith('/')) {
+  if (/^https?:\/\//i.test(url)) {
     return url;
   }
 
-  return `${apiBaseUrl}${url}`;
+  if (!apiBaseUrl) {
+    return url;
+  }
+
+  return `${apiBaseUrl}${url.startsWith('/') ? url : `/${url}`}`;
 }
