@@ -3,6 +3,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import pinoHttp from "pino-http";
 import path from "node:path";
+import type { RequestListener } from "node:http";
 import router from "./routes";
 import { logger } from "./lib/logger";
 import { getObjectStream } from "./lib/storage";
@@ -67,5 +68,9 @@ app.get(/^\/uploads\/(.+)$/, serveUploadedObject);
 app.get(/^\/api\/uploads\/(.+)$/, serveUploadedObject);
 
 app.use("/api", router);
+
+export const requestListener: RequestListener = (req, res) => {
+  return (app as unknown as { handle: RequestListener }).handle(req, res);
+};
 
 export default app;
