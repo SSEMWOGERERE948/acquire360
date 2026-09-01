@@ -15,6 +15,9 @@ const basePath = process.env.BASE_PATH ?? '/';
 
 export default defineConfig({
   base: basePath,
+  define: {
+    'import.meta.env.API_BASE_URL': JSON.stringify(process.env.API_BASE_URL),
+  },
   plugins: [
     react(),
     tailwindcss(),
